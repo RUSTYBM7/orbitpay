@@ -4,22 +4,53 @@ on:
   push:
     branches: [ main ]
   workflow_dispatch:
+    inputs:
+      lane:
+        description: 'Fastlane lane'
+        required: true
+        default: 'beta'
+        type: choice
+        options:
+          - beta
+          - build_enterprise
 
 jobs:
   build:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode.app
+
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.2'
-      - name: Install fastlane
-        run: cd flutter_app && bundle install
+          bundler-cache: true
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.x'
+          channel: 'stable'
+
+      - name: Install dependencies
+        working-directory: flutter_app
+        run: |
+          bundle install
+          flutter pub get
+
       - name: Run Fastlane
+        working-directory: flutter_app
         env:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           ENTERPRISE_PROVISIONING_PROFILE: ${{ secrets.ENTERPRISE_PROVISIONING_PROFILE }}
-        run: cd flutter_app && bundle exec fastlane ${{ github.event.inputs.lane || 'beta' }}
+          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
+        run: bundle exec fastlane ${{ github.event.inputs.lane || 'beta' }}
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: OrbitPay-IPA
+          path: flutter_app/build/ios/ipa/*.ipa
