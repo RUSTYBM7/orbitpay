@@ -1,0 +1,40 @@
+name: Build iOS IPA (Simplified - No Secrets)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-ipa:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.x'
+          channel: 'stable'
+
+      - name: Setup Ruby (for future Fastlane)
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+
+      - name: Install Flutter dependencies
+        working-directory: flutter_app
+        run: flutter pub get
+
+      - name: Build IPA (Release)
+        working-directory: flutter_app
+        run: |
+          flutter build ipa --release --export-method=enterprise
+
+      - name: Upload IPA Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: OrbitPay-IPA
+          path: flutter_app/build/ios/ipa/*.ipa
+          retention-days: 30
