@@ -1,0 +1,1 @@
+ // Full main.dart with Firebase init and navigation (see complete zip for full code)

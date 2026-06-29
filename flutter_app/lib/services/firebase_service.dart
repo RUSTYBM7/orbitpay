@@ -1,0 +1,1 @@
+// Full FirebaseService for real-time updates (see complete zip)
