@@ -1,15 +1,10 @@
 # OrbitPay Credit Union
 
-**AI-powered real-time neo-bank app**
+**AI-powered real-time neo-bank app** (Production build)
 
-- Flutter mobile with premium Fintora-style UI
-- Firebase backend (Auth + Firestore real-time)
-- React admin panel with full control (funding, transaction seeding, card management)
-- All screens: Home, Cards, AI Assistant, Analytics, Investments, Crypto, Loans, Support, Notifications
-- Landing + realistic onboarding
-- GitHub Actions for CI/CD and Vercel deploy
+- Flutter mobile with premium UI
+- Firebase real-time backend
+- React admin panel
+- Full CI/CD to Vercel
 
-**Quick Start**
-See orbitpay_build_and_deploy_guide.md
-
-Repo created and pushed by Grok.
+**Deploy triggered!** Check Vercel dashboard for the latest deployment.
