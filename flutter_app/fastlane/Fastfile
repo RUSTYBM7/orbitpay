@@ -1,0 +1,36 @@
+default_platform(:ios)
+
+platform :ios do
+  before_all do
+    setup_circle_ci if is_ci
+  end
+
+  desc "Build and sign IPA with Enterprise certificate"
+  lane :build_enterprise do
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: "Runner.xcodeproj",
+      team_id: ENV["APPLE_TEAM_ID"],
+      profile_name: ENV["ENTERPRISE_PROVISIONING_PROFILE"],
+      bundle_identifier: "com.orbitpay.creditunion"
+    )
+
+    build_app(
+      scheme: "Runner",
+      export_method: "enterprise",
+      export_options: {
+        method: "enterprise",
+        provisioningProfiles: {
+          "com.orbitpay.creditunion" => ENV["ENTERPRISE_PROVISIONING_PROFILE"]
+        }
+      },
+      output_directory: "./build/ios/ipa"
+    )
+  end
+
+  desc "Upload IPA to TestFlight"
+  lane :beta do
+    build_enterprise
+    upload_to_testflight(skip_waiting_for_build_processing: true)
+  end
+end

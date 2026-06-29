@@ -1,0 +1,25 @@
+name: iOS Fastlane Build & TestFlight
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+      - name: Install fastlane
+        run: cd flutter_app && bundle install
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+      - name: Run Fastlane
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          ENTERPRISE_PROVISIONING_PROFILE: ${{ secrets.ENTERPRISE_PROVISIONING_PROFILE }}
+        run: cd flutter_app && bundle exec fastlane ${{ github.event.inputs.lane || 'beta' }}
